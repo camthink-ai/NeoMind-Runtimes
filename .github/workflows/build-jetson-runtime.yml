@@ -1,0 +1,80 @@
+name: build-jetson-runtime
+
+# Rebuild the Jetson llama-server runtime for a given llama.cpp tag and publish
+# it under `runtime-<tag>` on this repo's Releases.
+#
+# Recipe mirrors the on-device build verified on Orin Nano 8GB (JP 6.2.1,
+# CUDA 12.6): gcc-11, GGML_CUDA=ON, sm_87, cudart static-ish chain via the
+# toolkit, and $ORIGIN RUNPATH so the thin llama-server wrapper finds its
+# sibling .so files from any working directory. NOTE: this workflow is the
+# CI reproduction of that recipe — the first successful run should be
+# smoke-tested on a real Jetson before the asset is promoted to customers.
+#
+# Requires a repo secret GITHUB_TOKEN (default — the built-in token can
+# create releases).
+
+on:
+  workflow_dispatch:
+    inputs:
+      llama_cpp_tag:
+        description: "llama.cpp release tag (e.g. b10545)"
+        required: true
+        default: "b10545"
+
+jobs:
+  build-jetson:
+    runs-on: ubuntu-22.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install CUDA 12.6 toolkit (aarch64)
+        run: |
+          curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/sbsa/cuda-keyring_1.1-1_all.deb -o cuda-keyring.deb
+          sudo dpkg -i cuda-keyring.deb
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cuda-toolkit-12-6 cmake git
+
+      - name: Clone llama.cpp @ tag
+        run: |
+          git clone --depth 1 --branch ${{ inputs.llama_cpp_tag }} \
+            https://github.com/ggml-org/llama.cpp.git
+
+      - name: Configure (CUDA sm_87, $ORIGIN runpath)
+        working-directory: llama.cpp
+        run: |
+          cmake -B build -S . \
+            -DGGML_CUDA=ON \
+            -DCMAKE_CUDA_ARCHITECTURES=87 \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc \
+            -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON \
+            -DCMAKE_INSTALL_RPATH='$ORIGIN'
+
+      - name: Build llama-server
+        working-directory: llama.cpp
+        run: |
+          # CUDA compiles are memory-hungry; stay conservative on the runner.
+          cmake --build build --target llama-server -j2
+
+      - name: Package (whole bin/ tree + strip)
+        run: |
+          mkdir -p pkg
+          cp -a llama.cpp/build/bin/. pkg/
+          strip --strip-unneeded pkg/llama-server pkg/lib*.so.* 2>/dev/null || true
+          ASSET=llama-server-${{ inputs.llama_cpp_tag }}-linux-aarch64-jetson.tar.gz
+          tar czf "$ASSET" -C pkg .
+          echo "ASSET=$ASSET" >> "$GITHUB_ENV"
+          echo "SHA=$(sha256sum "$ASSET" | cut -d' ' -f1)" >> "$GITHUB_ENV"
+
+      - name: Publish release runtime-${{ inputs.llama_cpp_tag }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "runtime-${{ inputs.llama_cpp_tag }}" \
+            "${{ env.ASSET }}" \
+            --repo "${{ github.repository }}" \
+            --title "llama.cpp ${{ inputs.llama_cpp_tag }} runtimes" \
+            --notes "Jetson (Orin, sm_87): gcc-11 CUDA build.
+              SHA-256: ${{ env.SHA }}
+              Update the NeoMind pin (JETSON_RUNTIME_SHA256) with this SHA."
