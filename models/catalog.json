@@ -14,7 +14,7 @@
       "default_ctx": 131072,
       "default_thinking": true,
       "min_ram_mb": 3072,
-      "notes": "小体积 + 原生 128K 上下文(hybrid KV 很省) — 资源紧张设备的默认选择",
+      "notes": "Small + native 128K context (hybrid KV is cheap) — the default for resource-constrained devices",
       "recommended": true
     },
     {
@@ -29,7 +29,7 @@
       "default_ctx": 32768,
       "default_thinking": false,
       "min_ram_mb": 4096,
-      "notes": "30 案 eval 最强的端侧 agent 模型(76% cmd_ok) — 工具调用首选",
+      "notes": "Strongest edge agent in 30-case evals (76% cmd_ok) — preferred for tool calling",
       "recommended": false
     },
     {
@@ -44,7 +44,7 @@
       "default_ctx": 32768,
       "default_thinking": true,
       "min_ram_mb": 4608,
-      "notes": "Google 官方 QAT 量化 — 可挂 mmproj 加视觉",
+      "notes": "Official Google QAT quantization — add mmproj for vision",
       "recommended": false
     }
   ]
