@@ -46,6 +46,21 @@
       "min_ram_mb": 4608,
       "notes": "Official Google QAT quantization — add mmproj for vision",
       "recommended": false
+    },
+    {
+      "id": "ling30-tiny",
+      "name": "Ling-3.0-tiny",
+      "file_name": "ling-3.0-tiny-q4_k_m.gguf",
+      "sha256": "9842cce7c1a07ad4adefd2b79a1035710ff196576d89128eade29351b79c8e68",
+      "quant": "q4_k_m",
+      "hf_repo": "bloomer010/Ling-3.0-tiny-GGUF",
+      "hf_file": "Ling-3.0-tiny-Q4_K_M.gguf",
+      "size_bytes": 4823894880,
+      "default_ctx": 131072,
+      "default_thinking": true,
+      "min_ram_mb": 6144,
+      "notes": "Tiny MoE (7.9B total / 1.3B active) — 77% on the 30-case agent suite (ties Qwen 3.5 4B) while generating ~45% faster on M4-class hardware. Thinking is integral.",
+      "recommended": false
     }
   ]
 }
