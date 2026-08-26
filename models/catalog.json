@@ -15,7 +15,8 @@
       "default_thinking": true,
       "min_ram_mb": 3072,
       "notes": "Small + native 128K context (hybrid KV is cheap) — the default for resource-constrained devices",
-      "recommended": true
+      "recommended": true,
+      "max_ctx": 131072
     },
     {
       "id": "qwen3.5-4b",
@@ -30,7 +31,8 @@
       "default_thinking": false,
       "min_ram_mb": 4096,
       "notes": "Strongest edge agent in 30-case evals (76% cmd_ok) — preferred for tool calling",
-      "recommended": false
+      "recommended": false,
+      "max_ctx": 262144
     },
     {
       "id": "gemma4-e2b",
@@ -45,7 +47,8 @@
       "default_thinking": true,
       "min_ram_mb": 4608,
       "notes": "Official Google QAT quantization — add mmproj for vision",
-      "recommended": false
+      "recommended": false,
+      "max_ctx": 131072
     },
     {
       "id": "ling30-tiny",
@@ -60,7 +63,8 @@
       "default_thinking": true,
       "min_ram_mb": 6144,
       "notes": "Tiny MoE — fast generation with strong agent scores",
-      "recommended": false
+      "recommended": false,
+      "max_ctx": 131072
     }
   ]
 }
