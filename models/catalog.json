@@ -59,7 +59,7 @@
       "default_ctx": 131072,
       "default_thinking": true,
       "min_ram_mb": 6144,
-      "notes": "Tiny MoE (7.9B total / 1.3B active) — 77% on the 30-case agent suite (ties Qwen 3.5 4B) while generating ~45% faster on M4-class hardware. Thinking is integral.",
+      "notes": "Tiny MoE — fast generation with strong agent scores",
       "recommended": false
     }
   ]
