@@ -1,5 +1,5 @@
 {
-    "catalog_version": 6,
+    "catalog_version": 7,
     "schema": "neomind-model-catalog/v1",
     "models": [
         {
@@ -11,7 +11,7 @@
             "hf_repo": "openbmb/MiniCPM5-2B-GGUF",
             "hf_file": "MiniCPM5-2B-Q4_K_M.gguf",
             "size_bytes": 1561318368,
-            "default_ctx": 32768,
+            "default_ctx": 131072,
             "max_ctx": 131072,
             "default_thinking": true,
             "min_ram_mb": 3072,
@@ -20,7 +20,7 @@
             "top_k": 40,
             "min_p": 0.0,
             "repeat_penalty": 1.05,
-            "notes": "Top edge agent, 2026-09 eval (81% tool accuracy, ties cloud deepseek-v4-flash) — Apache-2.0. Serve @32K: platform prompt overhead starves 8K/16K on long agent turns",
+            "notes": "Top edge agent, 2026-09 eval (81% tool accuracy, ties cloud deepseek-v4-flash) — Apache-2.0. Default 128K; spawn auto-caps ctx to device RAM (dense KV ≈ 5.5 GB @128K)",
             "recommended": true
         },
         {
@@ -38,10 +38,10 @@
             "notes": "Native 128K context (hybrid KV is cheap) — 2026-09 eval: 67% tool accuracy, 41/100 overall; long-session niche, superseded by MiniCPM5-2B as default",
             "recommended": false,
             "max_ctx": 131072,
-      "temperature": 0.1,
-      "top_p": 1.0,
-      "top_k": 50,
-      "repeat_penalty": 1.1
+            "temperature": 0.1,
+            "top_p": 1.0,
+            "top_k": 50,
+            "repeat_penalty": 1.1
         },
         {
             "id": "qwen3.5-4b",
@@ -52,10 +52,10 @@
             "hf_repo": "unsloth/Qwen3.5-4B-GGUF",
             "hf_file": "Qwen3.5-4B-Q4_K_M.gguf",
             "size_bytes": 2740000000,
-            "default_ctx": 32768,
+            "default_ctx": 131072,
             "default_thinking": false,
             "min_ram_mb": 4096,
-            "notes": "Strongest agent at 16K (70/100 — 2026-09 eval); starved at 8K (38). Vision via mmproj. Serve @32K: platform prompt overhead starves 16K on long sessions",
+            "notes": "Strongest agent at 16K (70/100 — 2026-09 eval); starved at 8K (38). Vision via mmproj. Default 128K (hybrid arch, ≈4.2 GB KV); spawn auto-caps ctx to device RAM",
             "recommended": false,
             "max_ctx": 262144,
             "temperature": 0.7,
@@ -71,10 +71,10 @@
             "hf_repo": "google/gemma-4-E2B-it-qat-q4_0-gguf",
             "hf_file": "gemma-4-E2B_q4_0-it.gguf",
             "size_bytes": 3100000000,
-            "default_ctx": 32768,
+            "default_ctx": 131072,
             "default_thinking": true,
             "min_ram_mb": 4608,
-            "notes": "Official Google QAT quantization — add mmproj for vision. 74% tool accuracy / 59 overall (2026-09); resource creation fails on real data",
+            "notes": "Official Google QAT quantization — add mmproj for vision. 74% tool accuracy / 59 overall (2026-09); resource creation fails on real data. Default 128K (sliding-window KV ≈ 1.9 GB, RAM-guarded)",
             "recommended": false,
             "max_ctx": 131072,
             "temperature": 1.0,
