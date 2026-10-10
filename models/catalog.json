@@ -1,5 +1,5 @@
 {
-    "catalog_version": 7,
+    "catalog_version": 8,
     "schema": "neomind-model-catalog/v1",
     "models": [
         {
@@ -90,10 +90,10 @@
             "hf_repo": "inclusionAI/Ling-3.0-tiny-GGUF",
             "hf_file": "Ling-3.0-tiny-Q4_K_M.gguf",
             "size_bytes": 4823894880,
-            "default_ctx": 8192,
+            "default_ctx": 131072,
             "default_thinking": true,
             "min_ram_mb": 6144,
-            "notes": "Fast MoE, 8K-only — cliffs past 8K (62→48 @16K, 2026-09 eval). MIT; needs llama.cpp >= b10545 (bailingmoe3)",
+            "notes": "Fast MoE (7.9B total / 1.3B active, MIT) — needs llama.cpp >= b10545 (bailingmoe3). Default 128K (product decision 2026-10-10, overrides the measured 16K+ quality cliff — monitor long sessions). Official ceiling: 128K native, 256K via YaRN (not enabled)",
             "recommended": false,
             "max_ctx": 131072,
             "temperature": 1.0,
