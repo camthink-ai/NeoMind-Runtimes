@@ -1,5 +1,5 @@
 {
-    "catalog_version": 3,
+    "catalog_version": 6,
     "schema": "neomind-model-catalog/v1",
     "models": [
         {
@@ -15,10 +15,12 @@
             "max_ctx": 131072,
             "default_thinking": true,
             "min_ram_mb": 3072,
-            "temperature": 0.6,
-            "top_p": 0.85,
+            "temperature": 1.0,
+            "top_p": 0.95,
             "top_k": 40,
-            "notes": "Top edge agent on the 2026-09 eval (81% tool accuracy, most robust across windows, ties cloud deepseek-v4-flash) — Apache-2.0. Serve @32K (product default 2026-09-12): the harness 8K optimum assumed a light prompt; platform prompt overhead (4-6K tokens) starves 8K/16K for long agent turns.",
+            "min_p": 0.0,
+            "repeat_penalty": 1.05,
+            "notes": "Top edge agent, 2026-09 eval (81% tool accuracy, ties cloud deepseek-v4-flash) — Apache-2.0. Serve @32K: platform prompt overhead starves 8K/16K on long agent turns",
             "recommended": true
         },
         {
@@ -36,9 +38,10 @@
             "notes": "Native 128K context (hybrid KV is cheap) — 2026-09 eval: 67% tool accuracy, 41/100 overall; long-session niche, superseded by MiniCPM5-2B as default",
             "recommended": false,
             "max_ctx": 131072,
-            "temperature": 0.6,
-            "top_p": 0.85,
-            "top_k": 20
+      "temperature": 0.1,
+      "top_p": 1.0,
+      "top_k": 50,
+      "repeat_penalty": 1.1
         },
         {
             "id": "qwen3.5-4b",
@@ -49,10 +52,10 @@
             "hf_repo": "unsloth/Qwen3.5-4B-GGUF",
             "hf_file": "Qwen3.5-4B-Q4_K_M.gguf",
             "size_bytes": 2740000000,
-            "default_ctx": 16384,
+            "default_ctx": 32768,
             "default_thinking": false,
             "min_ram_mb": 4096,
-            "notes": "Strongest agent at 16K context (70/100, recall 50% — 2026-09 eval); starved at 8K (38). Vision via mmproj. Serve @16K",
+            "notes": "Strongest agent at 16K (70/100 — 2026-09 eval); starved at 8K (38). Vision via mmproj. Serve @32K: platform prompt overhead starves 16K on long sessions",
             "recommended": false,
             "max_ctx": 262144,
             "temperature": 0.7,
