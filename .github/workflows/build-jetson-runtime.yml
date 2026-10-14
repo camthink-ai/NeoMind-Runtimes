@@ -6,9 +6,11 @@ name: build-jetson-runtime
 # Recipe mirrors the on-device build verified on Orin Nano 8GB (JP 6.2.1,
 # CUDA 12.6): gcc-11, GGML_CUDA=ON, sm_87, cudart static-ish chain via the
 # toolkit, and $ORIGIN RUNPATH so the thin llama-server wrapper finds its
-# sibling .so files from any working directory. NOTE: this workflow is the
-# CI reproduction of that recipe — the first successful run should be
-# smoke-tested on a real Jetson before the asset is promoted to customers.
+# sibling .so files from any working directory. The CPU backend is pinned to
+# armv8.2-a (GGML_NATIVE=OFF) — see the note in the Configure step.
+# NOTE: this workflow is the CI reproduction of that recipe — the first
+# successful run should be smoke-tested on a real Jetson before the asset
+# is promoted to customers.
 #
 # Requires a repo secret GITHUB_TOKEN (default — the built-in token can
 # create releases).
@@ -40,7 +42,7 @@ jobs:
           git clone --depth 1 --branch ${{ inputs.llama_cpp_tag }} \
             https://github.com/ggml-org/llama.cpp.git
 
-      - name: Configure (CUDA sm_87, $ORIGIN runpath)
+      - name: Configure (CUDA sm_87, $ORIGIN runpath, armv8.2-a baseline)
         working-directory: llama.cpp
         run: |
           cmake -B build -S . \
@@ -49,7 +51,15 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc \
             -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON \
-            -DCMAKE_INSTALL_RPATH='$ORIGIN'
+            -DCMAKE_INSTALL_RPATH='$ORIGIN' \
+            -DGGML_NATIVE=OFF \
+            -DGGML_CPU_ARM_ARCH=armv8.2-a
+          # GGML_NATIVE=OFF is NOT optional: GH's ubuntu-22.04-arm runners are
+          # Neoverse (ARMv9, SVE) and native compiles SVE into libggml-cpu,
+          # which SIGILLs on every Orin (Cortex-A78AE, ARMv8.2, no SVE) — the
+          # b11609 asset shipped exactly that bug (diagnosed 2026-10-14 on an
+          # NG4520: 1000+ SVE instructions vs zero in the on-device b10545).
+          # The CUDA side is host-independent (fatbin pinned to sm_87).
 
       - name: Build llama-server
         working-directory: llama.cpp

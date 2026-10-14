@@ -28,9 +28,14 @@ binaries for that version:
 `.github/workflows/build-jetson-runtime.yml` is a `workflow_dispatch` with a
 `LLAMA_CPP_TAG` input: on `ubuntu-22.04-arm`, installs the CUDA 12.6 aarch64
 toolkit, configures with `-DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=87
--DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_INSTALL_RPATH=$ORIGIN`, builds only
-`llama-server`, then packages the whole `bin/` tree (the server is a thin
-wrapper that dlopens sibling `.so`s — a single-file extract dies on exec).
+-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_INSTALL_RPATH=$ORIGIN
+-DGGML_NATIVE=OFF -DGGML_CPU_ARM_ARCH=armv8.2-a`, builds only `llama-server`,
+then packages the whole `bin/` tree (the server is a thin wrapper that
+dlopens sibling `.so`s — a single-file extract dies on exec). The
+`GGML_NATIVE=OFF` pin is mandatory: the arm64 runners are Neoverse (ARMv9,
+SVE) and a native CPU backend SIGILLs on every Orin (Cortex-A78AE, ARMv8.2,
+no SVE) — the first CI-built b11609 asset shipped exactly that bug and was
+rebuilt on-device 2026-10-14.
 
 The first release (b10545) was **built on-device** on a real Orin Nano 8GB
 (JP 6.2.1, CUDA 12.6) — best provenance; the CI path reproduces the same
