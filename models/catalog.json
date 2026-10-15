@@ -1,5 +1,5 @@
 {
-    "catalog_version": 8,
+    "catalog_version": 9,
     "schema": "neomind-model-catalog/v1",
     "models": [
         {
@@ -21,7 +21,7 @@
             "min_p": 0.0,
             "repeat_penalty": 1.05,
             "notes": "Top edge agent, 2026-09 eval (81% tool accuracy, ties cloud deepseek-v4-flash) — Apache-2.0. Default 128K; spawn auto-caps ctx to device RAM (dense KV ≈ 5.5 GB @128K)",
-            "recommended": true
+            "recommended": false
         },
         {
             "id": "lfm25-2.6b",
@@ -35,8 +35,8 @@
             "default_ctx": 131072,
             "default_thinking": true,
             "min_ram_mb": 3072,
-            "notes": "Native 128K context (hybrid KV is cheap) — 2026-09 eval: 67% tool accuracy, 41/100 overall; long-session niche, superseded by MiniCPM5-2B as default",
-            "recommended": false,
+            "notes": "Default model (2026-10-10, user's production testing prefers LFM + Qwen3.5-4B over the harness eval's pick) — native 128K (hybrid KV is cheap), thinking always on; 2026-09 eval: 67% tool accuracy",
+            "recommended": true,
             "max_ctx": 131072,
             "temperature": 0.1,
             "top_p": 1.0,
