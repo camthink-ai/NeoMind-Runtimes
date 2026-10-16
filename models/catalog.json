@@ -1,5 +1,5 @@
 {
-    "catalog_version": 9,
+    "catalog_version": 10,
     "schema": "neomind-model-catalog/v1",
     "models": [
         {
@@ -99,6 +99,24 @@
             "temperature": 1.0,
             "top_p": 0.95,
             "top_k": 20
+        },
+        {
+            "id": "nanbeige4.2-3b",
+            "name": "Nanbeige4.2-3B",
+            "file_name": "nanbeige4.2-3b-q4_k_m.gguf",
+            "sha256": "ffe1b9b8ee95ec4b962c379905aa8be6f72ae9c4645c6c70e3b6ff7b197e6ef4",
+            "quant": "q4_k_m",
+            "hf_repo": "owao/Nanbeige4.2-3B-GGUF",
+            "hf_file": "Nanbeige4.2-3B-Q4_K_M.gguf",
+            "size_bytes": 2574807904,
+            "default_ctx": 131072,
+            "max_ctx": 262144,
+            "default_thinking": true,
+            "min_ram_mb": 4096,
+            "temperature": 1.0,
+            "top_p": 1.0,
+            "notes": "Agentic model by Nanbeige LLM Lab — Apache-2.0, zh+en, 4.17B Looped-Transformer. 82% on the 2026-10 agent eval (serve at temp 1.0). Thinking-heavy, slow decode — allow generous turn timeouts; requires a llama.cpp build with nanbeige support",
+            "recommended": false
         }
     ]
 }
