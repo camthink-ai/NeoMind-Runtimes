@@ -9,9 +9,10 @@ deserves a versioned home that isn't the product repo.
 ## Layout
 
 ```
-├── llama-server-<tag>-linux-aarch64-jetson.tar.gz   ← release asset (see below)
+├── llama-server-<tag>-linux-aarch64-jetson.tar.gz   ← release assets (see below)
+├── llama-server-<tag>-linux-x64-cuda.tar.gz
 ├── models/catalog.json                              ← model directory manifest
-└── .github/workflows/build-jetson-runtime.yml       ← rebuild pipeline
+└── .github/workflows/build-*-runtime.yml            ← rebuild pipelines
 ```
 
 ## Releases — one tag per llama.cpp version
@@ -22,6 +23,7 @@ binaries for that version:
 | Asset | Built with | Notes |
 |---|---|---|
 | `llama-server-<tag>-linux-aarch64-jetson.tar.gz` | gcc-11 + CUDA 12.6, `sm_87` | Orin-family. Official llama.cpp has **no** linux-aarch64 CUDA asset, and its `ubuntu-arm64` CPU build needs gcc-13 libstdc++ (GLIBCXX_3.4.32) — JetPack 6 ships gcc-11 and fails to exec. This is our CUDA build for that gap. |
+| `llama-server-<tag>-linux-x64-cuda.tar.gz` | gcc-11 + CUDA 12.4, `sm_75/80/86/89` | NVIDIA Linux servers (T4, A100, A10, RTX 30xx, L40S, RTX 40xx). llama.cpp's OFFICIAL ubuntu-cuda builds moved to a glibc-2.38 base (Ubuntu 24.04) — unusable on the Ubuntu-22.04 floor NeoMind supports — so we self-host this gcc-11/22.04 build instead. CUDA runtime libs (cudart/cublas/cublasLt) bundled with `$ORIGIN` RUNPATH: hosts need only an NVIDIA driver (≥525), no toolkit. NeoMind **auto-detects** qualifying NVIDIA GPUs (via `nvidia-smi`: compute cap 7.5–8.9, driver ≥525) and uses this build with zero configuration; `NEOMIND_BUILTIN_RUNTIME_VARIANT` forces either way. |
 
 ### Building (CI)
 
@@ -37,17 +39,28 @@ SVE) and a native CPU backend SIGILLs on every Orin (Cortex-A78AE, ARMv8.2,
 no SVE) — the first CI-built b11609 asset shipped exactly that bug and was
 rebuilt on-device 2026-10-14.
 
-The first release (b10545) was **built on-device** on a real Orin Nano 8GB
-(JP 6.2.1, CUDA 12.6) — best provenance; the CI path reproduces the same
-recipe for future bumps. The repo's release quality gate is a real-Jetson
-smoke (run llama-server + a generation) before promoting.
+`.github/workflows/build-linux-cuda-runtime.yml` is the x64 sibling: on
+`ubuntu-22.04`, CUDA 12.4 toolkit, `-DCMAKE_CUDA_ARCHITECTURES="75;80;86;89"`,
+same `$ORIGIN` packaging **plus** the CUDA runtime libs the binaries link
+(ldd-driven, so driver-only hosts work), and it uploads to an existing
+`runtime-<tag>` release when one is already there.
+
+The first Jetson release (b10545) was **built on-device** on a real Orin Nano
+8GB (JP 6.2.1, CUDA 12.6) — best provenance; the CI path reproduces the same
+recipe for future bumps. The first linux-x64 CUDA release (b10545) was
+**built on a real Tesla T4 host** (Ubuntu 22.04, CUDA 12.4 toolkit, driver
+575) following the same recipe. The repo's release quality gate is a
+real-hardware smoke (run llama-server + a generation) before promoting.
 
 ### Adding a new version
 
-1. Run the workflow with the new `LLAMA_CPP_TAG`, or build on-device.
-2. Smoke the artifact on a Jetson.
-3. `gh release create runtime-<tag> llama-server-<tag>-linux-aarch64-jetson.tar.gz --repo camthink-ai/NeoMind-Runtimes`
-4. In the NeoMind repo: bump `LLAMA_CPP_VERSION` + `JETSON_RUNTIME_SHA256`.
+1. Run the workflow with the new `LLAMA_CPP_TAG`, or build on-device
+   (`CUDA=1 scripts/build-llama-server.sh` in the NeoMind repo).
+2. Smoke the artifact on a real device of its class (Jetson / NVIDIA server).
+3. `gh release create runtime-<tag> <assets…> --repo camthink-ai/NeoMind-Runtimes`
+   (or `gh release upload runtime-<tag> <asset> --clobber` if the tag exists).
+4. In the NeoMind repo: bump `LLAMA_CPP_VERSION` + the asset's SHA pin
+   (`JETSON_RUNTIME_SHA256` / `LINUX_CUDA_RUNTIME_SHA256`).
 
 ## Model catalog (`models/catalog.json`)
 

@@ -1,0 +1,101 @@
+name: build-linux-cuda-runtime
+
+# Rebuild the linux-x64 CUDA llama-server runtime for a given llama.cpp tag
+# and publish it under `runtime-<tag>` on this repo's Releases.
+#
+# llama.cpp ships no official linux-x64 CUDA prebuilt (CPU/Vulkan tarballs
+# only) — this is OUR CUDA build for NVIDIA Linux servers (T4/A100/A10/
+# RTX 30xx/L40S/RTX 40xx, sm_75..89), the x64 sibling of the Jetson asset.
+#
+# Recipe (verified on a real Tesla T4 host, 2026-10-13): CUDA 12.4 toolkit
+# (broadest driver floor — same choice as the official Windows CUDA asset,
+# so a >=550 driver suffices), gcc-11, GGML_CUDA=ON, archs 75/80/86/89,
+# $ORIGIN RUNPATH, and the CUDA runtime libs (cudart/cublas/cublasLt)
+# bundled next to the binaries so driver-only hosts need no toolkit.
+#
+# The first successful run for a tag should be smoke-tested on a real NVIDIA
+# Linux host (llama-server --list-devices + a tiny generation) before the
+# asset's SHA is pinned in NeoMind.
+
+on:
+  workflow_dispatch:
+    inputs:
+      llama_cpp_tag:
+        description: "llama.cpp release tag (e.g. b10545)"
+        required: true
+        default: "b10545"
+
+jobs:
+  build-linux-cuda:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install CUDA 12.4 toolkit (x86_64)
+        run: |
+          curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb -o cuda-keyring.deb
+          sudo dpkg -i cuda-keyring.deb
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cuda-toolkit-12-4 cmake git
+
+      - name: Clone llama.cpp @ tag
+        run: |
+          git clone --depth 1 --branch ${{ inputs.llama_cpp_tag }} \
+            https://github.com/ggml-org/llama.cpp.git
+
+      - name: Configure (CUDA 75/80/86/89, $ORIGIN runpath)
+        working-directory: llama.cpp
+        run: |
+          cmake -B build -S . \
+            -DGGML_CUDA=ON \
+            -DCMAKE_CUDA_ARCHITECTURES="75;80;86;89" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CUDA_COMPILER=/usr/local/cuda-12.4/bin/nvcc \
+            -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON \
+            -DCMAKE_INSTALL_RPATH='$ORIGIN'
+
+      - name: Build llama-server
+        working-directory: llama.cpp
+        run: |
+          # CUDA compiles are memory-hungry; stay conservative on the runner.
+          cmake --build build --target llama-server -j2
+
+      - name: Package (bin/ tree + bundled CUDA runtime libs)
+        run: |
+          mkdir -p pkg
+          cp -a llama.cpp/build/bin/. pkg/
+          # Bundle the CUDA runtime libs the binaries link (driver-only
+          # hosts have no toolkit). Match by COMPONENT (cudart/cublas/
+          # nvrtc) — never 'cuda', which would drag in libcuda.so, the
+          # HOST driver library. cp -L resolves SONAME symlinks.
+          mapfile -t libs < <(ldd pkg/llama-server pkg/libggml-cuda.so 2>/dev/null \
+            | awk '/=> \// {print $3}' | sort -u \
+            | grep -E 'cudart|cublas|nvrtc' || true)
+          if [ ${#libs[@]} -eq 0 ]; then
+            echo "FATAL: no CUDA libs found via ldd — bundling skipped, driver-only hosts would break" >&2
+            exit 1
+          fi
+          for l in "${libs[@]}"; do cp -Lnv "$l" pkg/; done
+          strip --strip-unneeded pkg/llama-server pkg/lib*.so* 2>/dev/null || true
+          ASSET=llama-server-${{ inputs.llama_cpp_tag }}-linux-x64-cuda.tar.gz
+          tar czf "$ASSET" -C pkg .
+          echo "ASSET=$ASSET" >> "$GITHUB_ENV"
+          echo "SHA=$(sha256sum "$ASSET" | cut -d' ' -f1)" >> "$GITHUB_ENV"
+
+      - name: Publish (create release, or upload to an existing runtime-<tag>)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="runtime-${{ inputs.llama_cpp_tag }}"
+          if gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            gh release upload "$TAG" "${{ env.ASSET }}" --clobber --repo "${{ github.repository }}"
+          else
+            gh release create "$TAG" "${{ env.ASSET }}" \
+              --repo "${{ github.repository }}" \
+              --title "llama.cpp ${{ inputs.llama_cpp_tag }} runtimes"
+          fi
+          cat <<EOF
+          SHA-256: ${{ env.SHA }}
+          Update the NeoMind pin (LINUX_CUDA_RUNTIME_SHA256) with this SHA.
+          EOF

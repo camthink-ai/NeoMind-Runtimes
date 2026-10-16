@@ -45,8 +45,16 @@ jobs:
       - name: Configure (CUDA sm_87, $ORIGIN runpath, armv8.2-a baseline)
         working-directory: llama.cpp
         run: |
+          # GGML_NATIVE=OFF + armv8.2-a: GitHub's arm64 runners are ARMv9
+          # (Neoverse, SVE) while Jetson Orin (Cortex-A78AE) is ARMv8.2
+          # WITHOUT SVE — a native build SIGILLs on every Orin (the b11609
+          # asset shipped that way for a day: 1000+ SVE instructions in
+          # libggml-cpu vs zero in b10545, diagnosed 2026-10-14). Pin the
+          # common edge baseline; an on-device build can still go native.
           cmake -B build -S . \
             -DGGML_CUDA=ON \
+            -DGGML_NATIVE=OFF \
+            -DGGML_CPU_ARM_ARCH=armv8.2-a \
             -DCMAKE_CUDA_ARCHITECTURES=87 \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc \
