@@ -1,5 +1,5 @@
 {
-    "catalog_version": 10,
+    "catalog_version": 11,
     "schema": "neomind-model-catalog/v1",
     "models": [
         {
@@ -54,13 +54,20 @@
             "size_bytes": 2740000000,
             "default_ctx": 131072,
             "default_thinking": false,
-            "min_ram_mb": 4096,
-            "notes": "Strongest agent at 16K (70/100 — 2026-09 eval); starved at 8K (38). Vision via mmproj. Default 128K (hybrid arch, ≈4.2 GB KV); spawn auto-caps ctx to device RAM",
+            "min_ram_mb": 4800,
+            "notes": "Strongest agent at 16K (70/100 — 2026-09 eval); starved at 8K (38). Vision built in (mmproj ships with the download). Default 128K (hybrid arch, ≈4.2 GB KV); spawn auto-caps ctx to device RAM",
             "recommended": false,
             "max_ctx": 262144,
             "temperature": 0.7,
             "top_p": 0.8,
-            "top_k": 20
+            "top_k": 20,
+            "mmproj": {
+                "file_name": "qwen3.5-4b-mmproj-f16.gguf",
+                "sha256": "cd88edcf8d031894960bb0c9c5b9b7e1fea6abee02b9f7ce925a00d12891f864",
+                "hf_repo": "unsloth/Qwen3.5-4B-GGUF",
+                "hf_file": "mmproj-F16.gguf",
+                "size_bytes": 672423616
+            }
         },
         {
             "id": "gemma4-e2b",
@@ -73,13 +80,20 @@
             "size_bytes": 3100000000,
             "default_ctx": 131072,
             "default_thinking": true,
-            "min_ram_mb": 4608,
-            "notes": "Official Google QAT quantization — add mmproj for vision. 74% tool accuracy / 59 overall (2026-09); resource creation fails on real data. Default 128K (sliding-window KV ≈ 1.9 GB, RAM-guarded)",
+            "min_ram_mb": 5632,
+            "notes": "Official Google QAT quantization — vision built in (mmproj ships with the download). 74% tool accuracy / 59 overall (2026-09); resource creation fails on real data. Default 128K (sliding-window KV ≈ 1.9 GB, RAM-guarded)",
             "recommended": false,
             "max_ctx": 131072,
             "temperature": 1.0,
             "top_p": 0.95,
-            "top_k": 64
+            "top_k": 64,
+            "mmproj": {
+                "file_name": "gemma-4-E2B-it-mmproj.gguf",
+                "sha256": "021059cce659fe7f9170d5599761d7bbaf644b798dab9503aca30dc43e6beb14",
+                "hf_repo": "google/gemma-4-E2B-it-qat-q4_0-gguf",
+                "hf_file": "gemma-4-E2B-it-mmproj.gguf",
+                "size_bytes": 986833664
+            }
         },
         {
             "id": "ling30-tiny",
