@@ -1,5 +1,5 @@
 {
-    "catalog_version": 11,
+    "catalog_version": 12,
     "schema": "neomind-model-catalog/v1",
     "models": [
         {
@@ -131,6 +131,33 @@
             "top_p": 1.0,
             "notes": "Agentic model by Nanbeige LLM Lab — Apache-2.0, zh+en, 4.17B Looped-Transformer. 82% on the 2026-10 agent eval (serve at temp 1.0). Thinking-heavy, slow decode — allow generous turn timeouts; requires a llama.cpp build with nanbeige support",
             "recommended": false
+        },
+        {
+            "id": "minicpm-v-4.7-1b",
+            "name": "MiniCPM-V-4.7-1B",
+            "file_name": "minicpm-v-4.7-1b-q4_k_m.gguf",
+            "sha256": "588c6c94c82f756b86dba35c42ed9ba9ec187d65824eb52f039c347df563e63d",
+            "quant": "q4_k_m",
+            "hf_repo": "openbmb/MiniCPM-V-4.7-1B-GGUF",
+            "hf_file": "MiniCPM-V-4_7-1B-Q4_K_M.gguf",
+            "size_bytes": 672003680,
+            "default_ctx": 32768,
+            "max_ctx": 32768,
+            "default_thinking": false,
+            "min_ram_mb": 2400,
+            "temperature": 0.1,
+            "top_p": 0.95,
+            "top_k": 40,
+            "notes": "Vision companion (VLM) — runs alongside the main model to see images (vision tool + chat image delegation); official openbmb Q4_K_M + F16 projector, ~1.8 GB resident",
+            "recommended": false,
+            "role": "vlm",
+            "mmproj": {
+                "file_name": "minicpm-v-4.7-1b-mmproj-f16.gguf",
+                "sha256": "fb9cc047a3cdad5317fd8433a4aeda2d22f00f02ca4bd93b34ad84165b25a900",
+                "hf_repo": "openbmb/MiniCPM-V-4.7-1B-GGUF",
+                "hf_file": "mmproj-model-f16.gguf",
+                "size_bytes": 1110117984
+            }
         }
     ]
 }
