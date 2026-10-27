@@ -1,5 +1,5 @@
 {
-    "catalog_version": 12,
+    "catalog_version": 13,
     "schema": "neomind-model-catalog/v1",
     "models": [
         {
@@ -130,6 +130,26 @@
             "temperature": 1.0,
             "top_p": 1.0,
             "notes": "Agentic model by Nanbeige LLM Lab — Apache-2.0, zh+en, 4.17B Looped-Transformer. 82% on the 2026-10 agent eval (serve at temp 1.0). Thinking-heavy, slow decode — allow generous turn timeouts; requires a llama.cpp build with nanbeige support",
+            "recommended": false
+        },
+        {
+            "id": "sparkx2.6-4b",
+            "name": "Spark-X2.6-4B",
+            "file_name": "sparkx2.6-4b-q4_k_m.gguf",
+            "sha256": "91cb2811aebb47ac916aa619d27d4cdd7f4143106b7917accb8ead4cd7f5cbd9",
+            "quant": "q4_k_m",
+            "hf_repo": "XHToken/Spark-X2.6-4B-GGUF",
+            "hf_file": "Spark-X2.6-4B-Q4_K_M.gguf",
+            "size_bytes": 3543441312,
+            "default_ctx": 131072,
+            "max_ctx": 1048576,
+            "default_thinking": true,
+            "min_ram_mb": 6144,
+            "temperature": 1.0,
+            "top_p": 0.95,
+            "top_k": 0,
+            "repeat_penalty": 1.0,
+            "notes": "Official XHToken Q4_K_M — Apache-2.0, zh+en, ~4.1B (spark2_5 arch, needs llama.cpp >= b10828). Hybrid 3:1 sliding(512)/full attention → 1M native ctx (full-layer KV ≈ 38 GB @1M; spawn auto-caps ctx to device RAM, default 128K ≈ 4.9 GB KV). Controllable thinking budget (none/low/high); sampler = official point temp 1.0 / top_p 0.95 / top_k off",
             "recommended": false
         },
         {
