@@ -39,7 +39,11 @@ jobs:
 
       - name: Clone llama.cpp @ tag
         run: |
-          git clone --depth 1 --branch ${{ inputs.llama_cpp_tag }} \
+          # Full history, NOT --depth 1: llama.cpp derives LLAMA_BUILD_NUMBER
+          # from `git rev-list --count HEAD` — a shallow clone reports 1, so
+          # the b11960 builds shipped a "version: ... (build 1)" banner and
+          # version-probe parsing couldn't extract the real tag.
+          git clone --branch ${{ inputs.llama_cpp_tag }} \
             https://github.com/ggml-org/llama.cpp.git
 
       - name: Configure (CUDA sm_87, $ORIGIN runpath, armv8.2-a baseline)
