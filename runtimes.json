@@ -1,21 +1,24 @@
 {
   "schema": 1,
-  "recommended": "b11609",
+  "recommended": "b11960",
+  "recommended_by_platform": {
+    "linux/aarch64": "b11609"
+  },
   "variants": {
     "jetson": {
-      "tag": "b11609",
-      "asset": "llama-server-b11609-linux-aarch64-jetson.tar.gz",
-      "sha256": "60bc22258cb34796f2d1eb3900c3a6ca90a21df922c3a8e4f37f89e270720b4d"
+      "tag": "b11960",
+      "asset": "llama-server-b11960-linux-aarch64-jetson.tar.gz",
+      "sha256": "6bb6ff396a93ad3a481d233d6179bedcdcece4e5c618cf803aaa015e6a808f28"
     },
     "linux-cuda": {
-      "tag": "b11609",
-      "asset": "llama-server-b11609-linux-x64-cuda.tar.gz",
-      "sha256": "c1fcbf65aba46210ae6085a98175033a0b4cfc4adf6581bcb18beeafea560103"
+      "tag": "b11960",
+      "asset": "llama-server-b11960-linux-x64-cuda.tar.gz",
+      "sha256": "bfdbe9d54af279074e66aed4f5ba2971f50414b63fe4885ab9d8cf20ff739200"
     }
   },
   "notes": {
-    "zh": "初始通道版本，与平台 0.8.x 编译钉子 b11609 对齐。",
-    "en": "Initial channel, aligned with the platform 0.8.x compiled pin b11609."
+    "zh": "对齐 llama.cpp 0.8.0（b11960）。Jetson 为 armv8.2-a + sm_87 自托管构建；Linux x64 CUDA 覆盖 T4/A100/A10/RTX 30xx/40xx（CUDA 12.4，仅需驱动）。linux/aarch64 暂留 b11609：官方 arm64 包已升至 glibc 2.38 基座。",
+    "en": "Aligned with llama.cpp 0.8.0 (b11960). Jetson: self-hosted armv8.2-a + sm_87 build. Linux x64 CUDA covers T4/A100/A10/RTX 30xx/40xx (CUDA 12.4, driver-only hosts). linux/aarch64 holds at b11609: official arm64 builds moved to a glibc 2.38 base."
   },
   "min_platform": "0.0.1"
 }
