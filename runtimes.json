@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "recommended": "b11609",
+  "variants": {
+    "jetson": {
+      "tag": "b11609",
+      "asset": "llama-server-b11609-linux-aarch64-jetson.tar.gz",
+      "sha256": "60bc22258cb34796f2d1eb3900c3a6ca90a21df922c3a8e4f37f89e270720b4d"
+    },
+    "linux-cuda": {
+      "tag": "b11609",
+      "asset": "llama-server-b11609-linux-x64-cuda.tar.gz",
+      "sha256": "c1fcbf65aba46210ae6085a98175033a0b4cfc4adf6581bcb18beeafea560103"
+    }
+  },
+  "notes": {
+    "zh": "初始通道版本，与平台 0.8.x 编译钉子 b11609 对齐。",
+    "en": "Initial channel, aligned with the platform 0.8.x compiled pin b11609."
+  },
+  "min_platform": "0.0.1"
+}

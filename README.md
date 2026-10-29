@@ -92,3 +92,113 @@ Schema (mirrors `crates/neomind-core/src/builtin_llm/manifest.rs`):
 
 Bump `catalog_version` (top-level field) on each change. NeoMind clients can
 pin the version they've validated against; new versions are opt-in upgrades.
+
+## `runtimes.json` — the runtime update channel
+
+`runtimes.json` at the repo root is the **update channel** the running
+NeoMind platform polls (raw.githubusercontent URL; overridable via
+`NEOMIND_RUNTIME_CHANNEL_URL` for mirrors/air-gapped installs) to learn
+which llama.cpp runtime to recommend for the standalone, in-app runtime
+upgrade (内置模型管理 UI → 运行时行 → 升级):
+
+```json
+{
+  "schema": 1,
+  "recommended": "b11609",
+  "variants": {
+    "jetson":     { "tag": "…", "asset": "…", "sha256": "…" },
+    "linux-cuda": { "tag": "…", "asset": "…", "sha256": "…" }
+  },
+  "notes": { "zh": "…", "en": "…" },
+  "min_platform": "0.0.1"
+}
+```
+
+- `recommended` — the tag for official-asset variants (cpu / vulkan /
+  macOS / windows). Only recommend tags whose official ubuntu builds still
+  run on the Ubuntu-22.04 / glibc-2.35 / gcc-11 floor (exec-check them).
+- `recommended_by_platform` — per-`"<os>/<arch>"` override of
+  `recommended` (e.g. `{"linux/aarch64": "b11609"}`). Upstream floors move
+  PER-ARCH: the 0.8.x (b11960) official ubuntu-arm64 builds jumped to
+  glibc 2.38 (Ubuntu 24.04 base — verified by symbol scan 2026-10-29)
+  while ubuntu-x64 stayed at 2.34 — arm64 must hold back while x64 moves
+  forward, and a single global `recommended` cannot express that.
+- `variants` — per-self-hosted-variant entries. **`sha256` is mandatory**
+  there (executable downloads are hard-pinned); entries may lag
+  `recommended` until the Runtimes CI builds catch up. Optional `url`
+  overrides the download location (mirror); optional `official_base`
+  (top level) redirects official-asset downloads.
+- `min_platform` — refuse to recommend a runtime to platforms older than
+  this semver.
+
+### Bump runbook (keep everything in sync)
+
+1. Bump `LLAMA_CPP_VERSION` in `crates/neomind-core/src/builtin_llm/runtime.rs`
+   (NeoMind) — CI's `llama-pin-sync` gate also requires bumping
+   `scripts/build-llama-server.sh` + `scripts/install.sh` defaults.
+2. Build + publish the `runtime-<tag>` release assets here (Jetson via the
+   Runtimes CI workflow with `-DGGML_NATIVE=OFF -DGGML_CPU_ARM_ARCH=armv8.2-a`;
+   linux-cuda via the on-device T4 recipe).
+3. Backfill the two compiled-in SHAs in the same core file.
+4. Update `runtimes.json` (recommended + variant entries + notes) — **after**
+   the assets exist, since self-hosted entries are SHA-pinned.
+5. Release NeoMind.
+
+Adding a **new variant** (e.g. RKNN — see `runtimes/rknn/`): the
+SERVER-BINARY side is cheap — enum variant + asset mapping in the core
+file, a channel entry here, a build pipeline; the upgrade/revert/resolution
+flow is variant-agnostic (rkllm3-server is OpenAI-compatible). The MODEL
+side is not: RKNN models are chip-specific multi-file packages, not GGUF —
+`catalog.json` needs `format`/`target_hardware` fields, NeoMind's
+`manifest.rs` moves in lockstep, and the GGUF-centric download/import/
+spawn-arg paths need per-format arms. Close the redistribution gate in
+`runtimes/rknn/README.md` before any of that starts.
+
+## Model catalog contract — `format` & `target_hardware`
+
+Catalog entries may carry two optional fields that vendor model formats
+(rkllm today, further hardware vendors later) require. **Start adding them
+to new entries now** — consumers parse and expose them already:
+
+```json
+{
+  "id": "minicpm5-2b-rk3588",
+  "format": "rkllm",
+  "target_hardware": ["rk3588", "rk3572"],
+  "…": "the existing gguf-shaped fields"
+}
+```
+
+- `format` — OPEN STRING, not an enum: lowercase ascii/digits/hyphen, 2-16
+  chars (`gguf` | `rkllm` | a future `dxnn` | …). Absent = `gguf`. A vendor
+  that breaks package compatibility versions its string (`rkllm` →
+  `rkllm2`) rather than redefining it. The platform treats
+  unknown-but-wellformed formats as forward-compatible "unsupported here"
+  entries; only malformed strings drop (that entry alone, with a warn).
+- `target_hardware` — list of SoC/board ids the package runs on (matches
+  `runtimes/rknn/README.md`'s chip-specific multi-file packages:
+  `llm.rkllm` + `vision.rknn` + `embed.bin` + tokenizer). Absent/empty =
+  runs anywhere the format is supported. Host-side eligibility filtering
+  ships with the first hardware-specific model.
+- Multi-file packages will additionally carry a `files:
+  [{name, sha256}]` list — contract slot reserved, do not invent
+  single-sha workarounds for such entries.
+- **Hosting**: runtime binaries (tens of MB) live on this repo's Releases,
+  but model packages do NOT — GitHub caps release assets at 2 GiB and
+  catalog GGUFs already run 1.5–4.8 GB. Large packages go to CamThink's own
+  CDN (resources.camthink.ai or an S3/R2 bucket); catalog `files` entries
+  carry full URLs (the platform's mirror layer already honors them).
+- **RK boards may be rkllm-only**: whether the official llama.cpp
+  ubuntu-arm64 CPU build runs there depends on the image's libstdc++
+  (the Jetson note: official arm64 assets need gcc-13 GLIBCXX_3.4.32).
+  Never ASSUME a gguf CPU fallback on a board — `host_formats()` must
+  derive from what the runtime layer can actually resolve on that image
+  (verify on-device before enabling gguf entries in its filtered list).
+- **Converted models ship only through the output-diff gate** (compare
+  against the base model's outputs — the Qwen3.5-VL w4a16 export was
+  numerically corrupt with immediate EOS; see runtimes/rknn/README.md),
+  and expect a model x SoC packaging matrix (per-chip NPU targets), not
+  one artifact per model.
+
+NeoMind's `manifest.rs` writes `format` at install time (serde default
+`gguf` keeps every pre-format deployed manifest parsing unchanged).
