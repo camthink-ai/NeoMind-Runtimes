@@ -20,7 +20,7 @@
             "top_k": 40,
             "min_p": 0.0,
             "repeat_penalty": 1.05,
-            "notes": "Top edge agent, 2026-09 eval (81% tool accuracy, ties cloud deepseek-v4-flash) — Apache-2.0. Default 128K; spawn auto-caps ctx to device RAM (dense KV ≈ 5.5 GB @128K)",
+            "notes": "Apache-2.0 · 工具调用评测首选（2026-09 命中率 81%）· 128K 按内存自动封顶",
             "recommended": false
         },
         {
@@ -35,8 +35,8 @@
             "default_ctx": 131072,
             "default_thinking": true,
             "min_ram_mb": 3072,
-            "notes": "Default model (2026-10-10, user's production testing prefers LFM + Qwen3.5-4B over the harness eval's pick) — native 128K (hybrid KV is cheap), thinking always on; 2026-09 eval: 67% tool accuracy",
-            "recommended": true,
+            "notes": "长期默认模型 · 思考常开 · 原生 128K（混合 KV 便宜）· LiquidAI 自定义许可，商用需评估",
+            "recommended": false,
             "max_ctx": 131072,
             "temperature": 0.1,
             "top_p": 1.0,
@@ -55,7 +55,7 @@
             "default_ctx": 131072,
             "default_thinking": false,
             "min_ram_mb": 4800,
-            "notes": "Strongest agent at 16K (70/100 — 2026-09 eval); starved at 8K (38). Vision built in (mmproj ships with the download). Default 128K (hybrid arch, ≈4.2 GB KV); spawn auto-caps ctx to device RAM",
+            "notes": "16K 下 agent 能力最强 · 自带视觉 · 128K（约 4.2GB KV），建议 4GB+ 内存",
             "recommended": false,
             "max_ctx": 262144,
             "temperature": 0.7,
@@ -81,7 +81,7 @@
             "default_ctx": 131072,
             "default_thinking": true,
             "min_ram_mb": 5632,
-            "notes": "Official Google QAT quantization — vision built in (mmproj ships with the download). 74% tool accuracy / 59 overall (2026-09); resource creation fails on real data. Default 128K (sliding-window KV ≈ 1.9 GB, RAM-guarded)",
+            "notes": "Google QAT 官方量化 · 自带视觉 · 滑窗 KV 省 内存（128K 约 1.9GB）",
             "recommended": false,
             "max_ctx": 131072,
             "temperature": 1.0,
@@ -107,7 +107,7 @@
             "default_ctx": 131072,
             "default_thinking": true,
             "min_ram_mb": 6144,
-            "notes": "Fast MoE (7.9B total / 1.3B active, MIT) — needs llama.cpp >= b10545 (bailingmoe3). Default 128K (product decision 2026-10-10, overrides the measured 16K+ quality cliff — monitor long sessions). Official ceiling: 128K native, 256K via YaRN (not enabled)",
+            "notes": "MIT 快速 MoE（激活 1.3B）· 长会话质量有悬崖，适合短会话",
             "recommended": false,
             "max_ctx": 131072,
             "temperature": 1.0,
@@ -129,7 +129,7 @@
             "min_ram_mb": 4096,
             "temperature": 1.0,
             "top_p": 1.0,
-            "notes": "Agentic model by Nanbeige LLM Lab — Apache-2.0, zh+en, 4.17B Looped-Transformer. 82% on the 2026-10 agent eval (serve at temp 1.0). Thinking-heavy, slow decode — allow generous turn timeouts; requires a llama.cpp build with nanbeige support",
+            "notes": "Apache-2.0 中英 agentic（2026-10 评测 82%）· 思考重、解码慢，建议放宽轮次超时",
             "recommended": false
         },
         {
@@ -149,7 +149,7 @@
             "top_p": 0.95,
             "top_k": 0,
             "repeat_penalty": 1.0,
-            "notes": "Official XHToken Q4_K_M — Apache-2.0, zh+en, ~4.1B (spark2_5 arch, needs llama.cpp >= b10828). Hybrid 3:1 sliding(512)/full attention → 1M native ctx (full-layer KV ≈ 38 GB @1M; spawn auto-caps ctx to device RAM, default 128K ≈ 4.9 GB KV). Controllable thinking budget (none/low/high); sampler = official point temp 1.0 / top_p 0.95 / top_k off",
+            "notes": "Apache-2.0 中英 · 混合注意力原生 1M ctx（按内存封顶）· 思考预算可控",
             "recommended": false
         },
         {
@@ -171,7 +171,7 @@
             "top_k": 50,
             "min_p": 0.0,
             "repeat_penalty": 1.1,
-            "notes": "LiquidAI LFM3 — reasoning-first (<think> block), ChatML, qwen3_coder XML tool calls (platform-parsed). Official card sampler: temp 0.1 / top_p 1.0 / top_k 50 / min_p 0 / repeat 1.1. Requires llama.cpp >= b11960 (min_runtime-gated). LFM community license (weights).",
+            "notes": "LiquidAI 新一代 · 思考优先 + 平台解析工具调用 · 需运行时 ≥ b11960",
             "recommended": false
         },
         {
@@ -191,8 +191,8 @@
             "top_p": 0.95,
             "top_k": 0,
             "repeat_penalty": 1.0,
-            "notes": "Official XHToken Q4_K_M — Apache-2.0, zh+en, ~1.7B (spark2_5 arch, llama.cpp >= b10828). Same family as the 4B: hybrid 3:1 sliding(512)/full attention, 1M native ctx (RAM-capped), controllable thinking budget.",
-            "recommended": false
+            "notes": "Apache-2.0 中英 · 1.7B 轻量 · 混合注意力 1M ctx · 思考预算可控 · 默认推荐",
+            "recommended": true
         },
         {
             "id": "minicpm-v-4.7-1b",
@@ -210,7 +210,7 @@
             "temperature": 0.1,
             "top_p": 0.95,
             "top_k": 40,
-            "notes": "Vision companion (VLM) — runs alongside the main model to see images (vision tool + chat image delegation); official openbmb Q4_K_M + F16 projector, ~1.8 GB resident",
+            "notes": "视觉伴侣（VLM）· 与主模型并行看图 · 常驻约 1.8GB",
             "recommended": false,
             "role": "vlm",
             "mmproj": {
@@ -248,7 +248,7 @@
                 "hf_file": "mmproj-LFM3-VL-2B-Q8_0.gguf",
                 "size_bytes": 203031872
             },
-            "notes": "Vision companion (role=vlm) — image understanding (video fixed 2fps in llama.cpp). Reasoning-first, ChatML. Requires llama.cpp >= b11960 (min_runtime-gated). Q8_0 mmproj (203 MB) chosen over F16 (379 MB).",
+            "notes": "视觉伴侣（VLM）· 思考优先 · 需运行时 ≥ b11960 · Q8 投影仅 203MB",
             "recommended": false
         }
     ]
