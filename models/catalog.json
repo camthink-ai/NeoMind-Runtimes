@@ -1,5 +1,5 @@
 {
-    "catalog_version": 13,
+    "catalog_version": 14,
     "schema": "neomind-model-catalog/v1",
     "models": [
         {
@@ -153,6 +153,48 @@
             "recommended": false
         },
         {
+            "id": "lfm3-1.7b",
+            "name": "LFM3-1.7B",
+            "file_name": "lfm3-1.7b-q4_k_m.gguf",
+            "sha256": "3793e1e6e2266919d6e015287221b41100175a98eddaba92e111aed3b05c93c4",
+            "quant": "q4_k_m",
+            "hf_repo": "LiquidAI/LFM3-1.7B-GGUF",
+            "hf_file": "LFM3-1.7B-Q4_K_M.gguf",
+            "size_bytes": 1099627808,
+            "default_ctx": 131072,
+            "max_ctx": 131072,
+            "min_runtime": "b11960",
+            "default_thinking": true,
+            "min_ram_mb": 3072,
+            "temperature": 0.1,
+            "top_p": 1.0,
+            "top_k": 50,
+            "min_p": 0.0,
+            "repeat_penalty": 1.1,
+            "notes": "LiquidAI LFM3 — reasoning-first (<think> block), ChatML, qwen3_coder XML tool calls (platform-parsed). Official card sampler: temp 0.1 / top_p 1.0 / top_k 50 / min_p 0 / repeat 1.1. Requires llama.cpp >= b11960 (min_runtime-gated). LFM community license (weights).",
+            "recommended": false
+        },
+        {
+            "id": "sparkx2.6-1.7b",
+            "name": "Spark-X2.6-1.7B",
+            "file_name": "sparkx2.6-1.7b-q4_k_m.gguf",
+            "sha256": "7abd9859c10924be3c583945456fa9b25d0569484876105a7b7376f7938fffb7",
+            "quant": "q4_k_m",
+            "hf_repo": "XHToken/Spark-X2.6-1.7B-GGUF",
+            "hf_file": "Spark-X2.6-1.7B-Q4_K_M.gguf",
+            "size_bytes": 1768720512,
+            "default_ctx": 131072,
+            "max_ctx": 1048576,
+            "default_thinking": true,
+            "min_ram_mb": 4096,
+            "temperature": 1.0,
+            "top_p": 0.95,
+            "top_k": 0,
+            "repeat_penalty": 1.0,
+            "notes": "Official XHToken Q4_K_M — Apache-2.0, zh+en, ~1.7B (spark2_5 arch, llama.cpp >= b10828). Same family as the 4B: hybrid 3:1 sliding(512)/full attention, 1M native ctx (RAM-capped), controllable thinking budget.",
+            "recommended": false
+        },
+        {
             "id": "minicpm-v-4.7-1b",
             "name": "MiniCPM-V-4.7-1B",
             "file_name": "minicpm-v-4.7-1b-q4_k_m.gguf",
@@ -178,6 +220,36 @@
                 "hf_file": "mmproj-model-f16.gguf",
                 "size_bytes": 1110117984
             }
+        },
+        {
+            "id": "lfm3-vl-2b",
+            "name": "LFM3-VL-2B",
+            "file_name": "lfm3-vl-2b-q4_k_m.gguf",
+            "sha256": "56dac2e192ff0d9ab8507f4f1aeb4aed0463449bbbefaac79497f041c95f21eb",
+            "quant": "q4_k_m",
+            "hf_repo": "LiquidAI/LFM3-VL-2B-GGUF",
+            "hf_file": "LFM3-VL-2B-Q4_K_M.gguf",
+            "size_bytes": 1099627808,
+            "default_ctx": 32768,
+            "max_ctx": 32768,
+            "min_runtime": "b11960",
+            "default_thinking": true,
+            "min_ram_mb": 3072,
+            "temperature": 0.1,
+            "top_p": 1.0,
+            "top_k": 50,
+            "min_p": 0.0,
+            "repeat_penalty": 1.1,
+            "role": "vlm",
+            "mmproj": {
+                "file_name": "mmproj-lfm3-vl-2b-q8_0.gguf",
+                "sha256": "c5c5b58d544a18da919172d2d0368090ea1a4a351b6feb7f8a326a264a5918ab",
+                "hf_repo": "LiquidAI/LFM3-VL-2B-GGUF",
+                "hf_file": "mmproj-LFM3-VL-2B-Q8_0.gguf",
+                "size_bytes": 203031872
+            },
+            "notes": "Vision companion (role=vlm) — image understanding (video fixed 2fps in llama.cpp). Reasoning-first, ChatML. Requires llama.cpp >= b11960 (min_runtime-gated). Q8_0 mmproj (203 MB) chosen over F16 (379 MB).",
+            "recommended": false
         }
     ]
 }

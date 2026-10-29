@@ -175,6 +175,11 @@ to new entries now** — consumers parse and expose them already:
   `rkllm2`) rather than redefining it. The platform treats
   unknown-but-wellformed formats as forward-compatible "unsupported here"
   entries; only malformed strings drop (that entry alone, with a warn).
+- `min_runtime` — minimum llama.cpp runtime tag (e.g. `"b11960"`): while
+  the active runtime is older, the platform refuses the DOWNLOAD with
+  guidance pointing at the runtime upgrade dialog (LFM3 needs >= b11960 —
+  older runtimes fail with cryptic arch errors otherwise). Compared with
+  numeric b-tag ordering; absent = no floor.
 - `target_hardware` — list of SoC/board ids the package runs on (matches
   `runtimes/rknn/README.md`'s chip-specific multi-file packages:
   `llm.rkllm` + `vision.rknn` + `embed.bin` + tokenizer). Absent/empty =
