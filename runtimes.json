@@ -6,19 +6,19 @@
  },
  "variants": {
   "jetson": {
-   "tag": "b11960",
-   "asset": "llama-server-b11960-linux-aarch64-jetson.tar.gz",
-   "sha256": "6bb6ff396a93ad3a481d233d6179bedcdcece4e5c618cf803aaa015e6a808f28"
+   "tag": "b12024",
+   "asset": "llama-server-b12024-linux-aarch64-jetson.tar.gz",
+   "sha256": "bc7c089182c4edf1c36a7ff43c64386ba6e8dc60cd4c10098117a8da2c81c618"
   },
   "linux-cuda": {
-   "tag": "b11960",
-   "asset": "llama-server-b11960-linux-x64-cuda.tar.gz",
-   "sha256": "bfdbe9d54af279074e66aed4f5ba2971f50414b63fe4885ab9d8cf20ff739200"
+   "tag": "b12024",
+   "asset": "llama-server-b12024-linux-x64-cuda.tar.gz",
+   "sha256": "e93a154585077e27e7a54e130e24147315a04bef020f89f03dd523c238c5c0b4"
   }
  },
  "notes": {
-  "zh": "macOS 推荐 b12024：b11960 的 Metal 着色器在部分 macOS（如 15.6 arm64）上编译失败（constexpr 报错 → Metal 库初始化失败，lfm3 等新模型无法启动）；b12024 已在 macOS 15.6 arm64 实机验证（lfm3-1.7b 加载/推理正常）。Jetson 与 Linux x64 CUDA 仍为 b11960 自托管构建；linux/aarch64 暂留 b11609（官方 arm64 包 glibc 2.38 基座）。",
-  "en": "macOS recommends b12024: b11960's Metal shaders fail to compile on some macOS versions (constexpr error -> Metal init failure; newer models like lfm3 cannot start). b12024 verified on macOS 15.6 arm64 (lfm3-1.7b loads and serves). Jetson and Linux x64 CUDA stay on the b11960 self-hosted builds; linux/aarch64 holds at b11609 (glibc 2.38 base)."
+  "zh": "全平台对齐 llama.cpp b12024（b11960 的 Metal 着色器在部分 macOS 上编译失败）。Jetson 与 Linux x64 CUDA 的 b12024 自托管资产已于 2026-11-01 真机冒烟通过（Orin sm_87 层全量 offload、Tesla T4 CUDA0 推理，SHA 校验一致）。linux/aarch64 仍留 b11609（官方 arm64 包 glibc 2.38 基座）。",
+  "en": "All platforms aligned on llama.cpp b12024 (b11960's Metal shaders fail to compile on some macOS versions). The Jetson and Linux x64 CUDA b12024 self-hosted assets passed on-device smoke tests on 2026-11-01 (Orin sm_87 full layer offload; Tesla T4 CUDA0 inference; SHA-verified). linux/aarch64 holds at b11609 (glibc 2.38 base)."
  },
  "min_platform": "0.0.1"
 }
