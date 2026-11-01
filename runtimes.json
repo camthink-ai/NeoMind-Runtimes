@@ -1,24 +1,24 @@
 {
-  "schema": 1,
-  "recommended": "b11960",
-  "recommended_by_platform": {
-    "linux/aarch64": "b11609"
+ "schema": 1,
+ "recommended": "b12024",
+ "recommended_by_platform": {
+  "linux/aarch64": "b11609"
+ },
+ "variants": {
+  "jetson": {
+   "tag": "b11960",
+   "asset": "llama-server-b11960-linux-aarch64-jetson.tar.gz",
+   "sha256": "6bb6ff396a93ad3a481d233d6179bedcdcece4e5c618cf803aaa015e6a808f28"
   },
-  "variants": {
-    "jetson": {
-      "tag": "b11960",
-      "asset": "llama-server-b11960-linux-aarch64-jetson.tar.gz",
-      "sha256": "6bb6ff396a93ad3a481d233d6179bedcdcece4e5c618cf803aaa015e6a808f28"
-    },
-    "linux-cuda": {
-      "tag": "b11960",
-      "asset": "llama-server-b11960-linux-x64-cuda.tar.gz",
-      "sha256": "bfdbe9d54af279074e66aed4f5ba2971f50414b63fe4885ab9d8cf20ff739200"
-    }
-  },
-  "notes": {
-    "zh": "对齐 llama.cpp 0.8.0（b11960）。Jetson 为 armv8.2-a + sm_87 自托管构建；Linux x64 CUDA 覆盖 T4/A100/A10/RTX 30xx/40xx（CUDA 12.4，仅需驱动）。linux/aarch64 暂留 b11609：官方 arm64 包已升至 glibc 2.38 基座。",
-    "en": "Aligned with llama.cpp 0.8.0 (b11960). Jetson: self-hosted armv8.2-a + sm_87 build. Linux x64 CUDA covers T4/A100/A10/RTX 30xx/40xx (CUDA 12.4, driver-only hosts). linux/aarch64 holds at b11609: official arm64 builds moved to a glibc 2.38 base."
-  },
-  "min_platform": "0.0.1"
+  "linux-cuda": {
+   "tag": "b11960",
+   "asset": "llama-server-b11960-linux-x64-cuda.tar.gz",
+   "sha256": "bfdbe9d54af279074e66aed4f5ba2971f50414b63fe4885ab9d8cf20ff739200"
+  }
+ },
+ "notes": {
+  "zh": "macOS 推荐 b12024：b11960 的 Metal 着色器在部分 macOS（如 15.6 arm64）上编译失败（constexpr 报错 → Metal 库初始化失败，lfm3 等新模型无法启动）；b12024 已在 macOS 15.6 arm64 实机验证（lfm3-1.7b 加载/推理正常）。Jetson 与 Linux x64 CUDA 仍为 b11960 自托管构建；linux/aarch64 暂留 b11609（官方 arm64 包 glibc 2.38 基座）。",
+  "en": "macOS recommends b12024: b11960's Metal shaders fail to compile on some macOS versions (constexpr error -> Metal init failure; newer models like lfm3 cannot start). b12024 verified on macOS 15.6 arm64 (lfm3-1.7b loads and serves). Jetson and Linux x64 CUDA stay on the b11960 self-hosted builds; linux/aarch64 holds at b11609 (glibc 2.38 base)."
+ },
+ "min_platform": "0.0.1"
 }
